@@ -88,3 +88,44 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error(err);
         });
 });
+
+function searchProduct() {
+    const productId = document.getElementById('productId').value;
+
+    const productInfoDiv = document.getElementById('productInfo');
+    const errorMessageDiv = document.getElementById('errorMessage');
+
+    // Limpar as mensagens anteriores
+    productInfoDiv.style.display = 'none';
+    errorMessageDiv.textContent = '';
+
+    if (!productId) {
+        errorMessageDiv.textContent = 'Por favor, insira um ID de produto.';
+        return; 
+    }
+
+    fetch(`http://localhost:3000/product/${productId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao buscar o produto');
+            }
+            return response.json();
+        })
+        .then(product => {
+            let price = product.price.toFixed(2);
+            
+            productInfoDiv.style.display = 'block';
+            productInfoDiv.innerHTML = `
+                <h3>Produto Encontrado</h3>
+                <p><strong>ID:</strong> ${product.id}</p>
+                <p><strong>Nome:</strong> ${product.name}</p>
+                <p><strong>Quantidade:</strong> ${product.quantity}</p>
+                <p><strong>Preço:</strong> R$ ${price}</p>
+                <p><strong>Autor:</strong> ${product.author}</p>
+            `;
+        })
+        .catch(error => {
+            errorMessageDiv.textContent = 'Produto não encontrado ou erro de comunicação.';
+            console.error(error);
+        });
+}
